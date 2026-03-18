@@ -19,12 +19,12 @@ def portal(request, job_id=None):
         'prev_skip': max(0, current_skip - limit),
     }
     
-    # VIEW APPLICATIONS (Recruiter Section)
+    # VIEW APPLICATIONS
     if request.GET.get('action') == 'view' and job_id:
         res = requests.get(f"{API_BASE}/applications", params={'job_id': job_id})
         context.update({'view': 'applicants', 'apps': res.json(), 'job_id': job_id})
 
-    # CANDIDATE DATA ENTRY (Application Form)
+    # CANDIDATE DATA ENTRY
     elif job_id:
         form = ApplicationForm(request.POST or None)
         if request.method == "POST" and form.is_valid():
@@ -43,6 +43,6 @@ def portal(request, job_id=None):
         context.update({
             'jobs': jobs,
             'has_jobs': len(jobs) > 0,
-            'is_last_page': len(jobs) < limit # If we got fewer than 10, it's the end
+            'is_last_page': len(jobs) < limit 
         })
     return render(request, 'portal.html', context)
