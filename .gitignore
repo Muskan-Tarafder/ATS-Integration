@@ -1,0 +1,62 @@
+# Ignore virtual environments
+env/
+venv/
+.venv/
+.env
+
+# Ignore Python byte code cache
+*.pyc
+__pycache__
+.cache
+
+# Ignore coverage reports
+.coverage
+reports/
+htmlcov/
+
+# Ignore build results
+*.egg-info/
+pip-wheel-metadata/
+dist/
+build/
+.installed.cfg
+*.egg
+
+# OS-specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# Django-specific files
+*.log
+local_settings.py
+db.sqlite3  # Only if you use SQLite locally
+
+# Generated static and media files
+/static_root/
+/staticfiles/
+/media/
+
+# Testing and development tools
+.tox/
+.pytest_cache/
+
+# Migrations (Generally, keep migrations in version control, do not ignore them)
+# **/migrations/*.py
+# !**/migrations/__init__.py
+
+oauth.json
+node_modules/
+
+
+# Ignore local settings/secrets
+.env
+package.json
+package-lock.json
+
+
+

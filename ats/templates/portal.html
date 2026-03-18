@@ -1,0 +1,104 @@
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SAP ATS Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f7f9; font-family: 'Segoe UI', sans-serif; }
+        .main-card { border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .btn-sap { background: #0070d2; color: white; }
+    </style>
+</head>
+<body class="py-5">
+<div class="container" style="max-width: 800px;">
+
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">ATS Integration Portal</h2>
+        {% if view != 'jobs' %}<a href="/" class="btn btn-link text-decoration-none">← Back to Jobs</a>{% endif %}
+    </div>
+
+    <div class="card main-card p-4">
+        
+        {% if view == 'jobs' %}
+            <h5 class="mb-4 fw-bold">Open Positions</h5>
+            
+            {% for job in jobs %}
+            <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+                <div>
+                    <div class="fw-bold">{{ job.title }}</div>
+                    <small class="text-muted">{{ job.location }} | ID: {{ job.id }} | Status: {{ job.status }}</small>
+                </div>
+                <div class="btn-group">
+                    <a href="/{{ job.id }}/" class="btn btn-sm btn-sap">Apply</a>
+                    <a href="/{{ job.id }}/?action=view" class="btn btn-sm btn-outline-secondary">View</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-4 text-muted">No more jobs found.</div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                {% if current_skip > 0 %}
+                    <a href="/?skip={{ prev_skip }}" class="btn btn-outline-primary btn-sm">← Previous 10</a>
+                {% else %}
+                    <div></div> 
+                {% endif %}
+
+                <span class="text-muted small">
+                    Showing {{ current_skip|add:1 }} - 
+                    {% if is_last_page %}{{ current_skip|add:jobs|length }}{% else %}{{ current_skip|add:10 }}{% endif %}
+                </span>
+
+                {% if not is_last_page %}
+                    <a href="/?skip={{ next_skip }}" class="btn btn-outline-primary btn-sm">Next 10 →</a>
+                {% else %}
+                    <button class="btn btn-outline-secondary btn-sm disabled">End of List</button>
+                {% endif %}
+            </div>
+    </div>
+
+        {% elif view == 'apply' %}
+            <h5 class="mb-4 fw-bold text-center">Application Form (Job ID: {{ job_id }})</h5>
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-sap w-100 mt-3">Submit Application</button>
+            </form>
+
+        {% elif view == 'applicants' %}
+            <h5 class="mb-4 fw-bold">Applicants for Job #{{ job_id }}</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Name</th><th>Email</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for app in apps %}
+                        <tr>
+                            <td>{{ app.candidate_name }}</td>
+                            <td>{{ app.candidate_email }}</td>
+                            <td><span class="badge bg-primary">{{ app.status }}</span></td>
+                        </tr>
+                        {% empty %}<tr><td colspan="3" class="text-center py-4">No applicants yet.</td></tr>
+                        {% endfor %}
+                        <tr><td colspan="3" class="muted-text text-center py-4">Some created applications are not visible due to sandbox restriction in job link.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        {% elif view == 'success' %}
+            <div class="text-center py-5">
+                <div class="display-1 text-success mb-3">✓</div>
+                <h4>Account Successful!</h4>
+                <p class="text-muted">SAP Candidate ID: {{ res.sap_candidate_id|default:res.candidate_id }}</p>
+                <p class="text-muted">Job link restricted by sandbox permissions.</p>
+                <a href="/" class="btn btn-sap mt-3">Back to Home</a>
+            </div>
+        {% endif %}
+
+    </div>
+    
+    <p class="text-center text-muted mt-5 small">Abhinav M | Dayananda Sagar College of Engineering</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+service: ats
+frameworkVersion: '3'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  stage: dev
+  environment: 
+    SAP_API_KEY: ${env:SAP_API_KEY}
+    SAP_API_URL: ${env:SAP_API_URL}
+
+functions:
+  getJobs:
+    handler: handler.get_jobs
+    events:
+      - http:
+          path: jobs
+          method: get
+          cors: true
+  postCandidate:
+    handler: handler.post_candidate
+    events:
+      - http:
+          path: candidates
+          method: post
+          cors: true
+  getApplications:
+    handler: handler.get_job_applications
+    events:
+      - http:
+          path: applications
+          method: get
+          cors: true
+
+plugins:
+  - serverless-offline
