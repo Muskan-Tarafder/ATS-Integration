@@ -7,7 +7,7 @@ load_dotenv()
 api_key = os.getenv('SAP_API_KEY')
 base_url = os.getenv('SAP_API_URL')
 
-# Standard CORS Headers
+
 HEADERS_CORS = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Credentials": True,
@@ -15,7 +15,6 @@ HEADERS_CORS = {
 }
 
 def get_jobs(event, context):
-    # GET parameters come from queryStringParameters, not body
     params = event.get('queryStringParameters') or {}
     limit = params.get("limit", 10)
     skip = params.get("skip", 0)
@@ -38,13 +37,13 @@ def get_jobs(event, context):
                 status = "DRAFT"
             else:
                 status = "CLOSED"
-
+            
             unified_jobs.append({
                 'id': job.get('jobReqId'),
                 "title": job.get("templateName", "Untitled Position"),
                 "location": job.get("customString4", "Remote"),
                 'status': status,
-                'external_url': f"https://api.sap.com/api/RCM_JobReq/resource",
+                'external_url': job.get('__metadata', {}).get('uri'),
             })
         
         return {
@@ -69,7 +68,7 @@ def post_candidate(event, context):
             "Accept": "application/json"
         }
 
-        # STEP 1: Create Candidate
+        # Create Candidate
         candidate_payload = {
             "firstName": first_name,
             "lastName": last_name,
@@ -89,7 +88,6 @@ def post_candidate(event, context):
 
         candidate_id = cand_res.json()['d']['candidateId']
 
-        # STEP 2: Link to Job
         app_payload = {
             "jobReqId": str(body.get("job_id")),
             "candidateId": str(candidate_id),
@@ -105,7 +103,7 @@ def post_candidate(event, context):
         headers["DataServiceVersion"] = "2.0" 
         app_res = requests.post(f"{base_url}/JobApplication", headers=headers, json=app_payload)
 
-        # Handle the Sandbox 403 gracefully
+        # Handle the Sandbox 403
         if app_res.status_code == 403:
             return {
                 "statusCode": 201,
@@ -133,7 +131,7 @@ def get_job_applications(event, context):
     if not job_id:
         return {'statusCode': 400, 'headers': HEADERS_CORS, 'body': json.dumps({'error': 'Missing job_id'})}
     
-    # Correct SAP filter format for Long types
+
     url = f"{base_url}/JobApplication?$filter=jobReqId eq {job_id}L&$expand=candidate&$format=json"
     headers = {'APIKey': api_key, 'Accept': 'application/json'}
 
