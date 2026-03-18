@@ -28,11 +28,12 @@ The Sandbox uses the base URL: https://sandbox.api.sap.com/successfactors/odata/
 ## How to Run the Service Locally
 
 Prerequisites
-Node.js & npm (for Serverless Framework)
 
-Python 3.9+
+- Node.js & npm (for Serverless Framework)
 
-PostgreSQL (Local or Cloud)
+- Python 3.9+
+
+- PostgreSQL (Local or Cloud)
 
 1. Setup Backend (Serverless)
 ``` bash
